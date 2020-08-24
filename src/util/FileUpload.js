@@ -6,7 +6,11 @@ import axios from "axios"
 function FileUpload(props) {
 
   const [Images, setImages] = useState([])
-  const baseUrl = 'http://localhost:5000/accounts';
+  const [FilePath, setFilePath] = useState("")
+  const [Duration, setDuration] = useState("") 
+  const [Thumbnail, setThumbnail] = useState("")
+
+  const baseUrl = 'http://localhost:5000/youtube';
 
 
   const onDrop = (files) => {
@@ -16,26 +20,43 @@ function FileUpload(props) {
       header: { "content-type": "multipart/form-Data" },
     };
     formData.append("file", files[0]);
-     axios.post(`${baseUrl}/product/uploadImage`, formData, config)
+     axios.post(`${baseUrl}/uploadVideo`, formData, config)
      .then(res => {
          if(res.data.success){
-             setImages([...Images, res.data.image])
-             props.refreshFunction([...Images, res.data.image])
+            let variable = {
+              url: res.data.filePath,
+              fileName: res.data.fileName
+            }
+
+            setFilePath(res.data.filePath)
+            props.refreshFunction(res.data.filePath)
+            axios.post(`${baseUrl}/thumbnail`, variable) 
+            .then(res => {
+              if(res.data.success){
+                   setDuration(res.data.fileDuration)
+                   setThumbnail(res.data.url)
+                   props.thumbnailRefresh(res.data.url)
+                   props.duration(res.data.fileDuration)  
+              }else{
+                alert('Failed to generate thumbnail')
+              }
+            })
+
          }else{
-             alert('Failed to save image in server')
+             alert('Failed to save video in server')
          }
      })
     //save the image in the node server
   };
   
-  const onDelete = (image) => {
-       const currentIndex = Images.indexOf(image)
-       let newImages = [...Images]
-       newImages.splice(currentIndex, 1)
+  // const onDelete = (image) => {
+  //      const currentIndex = Images.indexOf(image)
+  //      let newImages = [...Images]
+  //      newImages.splice(currentIndex, 1)
 
-       setImages(newImages)
-       props.refreshFunction(newImages)
-  }
+  //      setImages(newImages)
+  //      props.refreshFunction(newImages)
+  // }
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <Dropzone onDrop={onDrop} 
@@ -67,11 +88,12 @@ function FileUpload(props) {
           overflowX: "scroll",
         }}
       >
-        {Images.map((image, index) =>
-              <div onClick={() => onDelete(image)} key={index}>
-              <img  style={{ minWidth: '300px', width: '300px', height:'240px'}} src={`http://localhost:5000/${image}`} alt={`productImg-${index}`}/>
+       
+             {Thumbnail !== ""  &&
+              <div>
+              <img  style={{ minWidth: '300px', width: '300px', height:'240px'}} src={`http://localhost:5000/${Thumbnail}`} alt="video"/>
             </div>
-        )}
+}
       </div>
     </div>
   );

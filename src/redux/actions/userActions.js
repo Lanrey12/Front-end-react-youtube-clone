@@ -1,8 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
 import { axiosWrapper } from '../actions/axios-wrap'
-import {ON_SUCCESS_BUY, GET_CART_ITEMS_USER, REMOVE_CART_ITEM_USER, REGISTER_USER, VERIFY_USER, LOGIN_USER, DELETE_USER, FORGOT_PASSWORD, VALIDATE_TOKEN, RESET_PASSWORD, GET_USERS, GET_ONE_USER, LOGOUT_USER, UPDATE_USER, ADD_USER, ADD_TO_CART_USER } from '../type'
+import { REGISTER_USER, VERIFY_USER, LOGIN_USER, DELETE_USER, FORGOT_PASSWORD, VALIDATE_TOKEN, RESET_PASSWORD, GET_USERS, GET_ONE_USER, LOGOUT_USER, UPDATE_USER, ADD_USER } from '../type'
 import { createBrowserHistory } from 'history';
-import Axios from 'axios'
+
 
 
 const history = createBrowserHistory();
@@ -36,7 +36,7 @@ export function loginUser(email, password){
     const request = axiosWrapper.post(`${baseUrl}/authenticate`, { email, password})
     .then (user => {
         localStorage.setItem('user', JSON.stringify(user));
-
+        localStorage.setItem('userId',(user.id));
             // publish user to subscribers
             userSubject.next(user);
             return user
@@ -141,68 +141,4 @@ function _delete(id){
         type: DELETE_USER,
         payload: request
     })
-}
-
-export function addToCart(_id) {
-    const request = Axios.get(`${baseUrl}/product/addToCart?productId=${_id}`)
-    .then(res => res.data) 
-    return {
-        type: ADD_TO_CART_USER,
-        payload: request
-    }
-}
-
-export function getCartItems(cartItems, userCart) {
-    const request = 
-    Axios.get(`${baseUrl}/product/products_by_id?id=${cartItems}&type=array`)
-    .then(res => {
-        userCart.forEach(cartItem => {
-            res.data.forEach((productDetail, i) => {
-                 if(cartItem.id === productDetail._id){
-                     res.data[i].quantity = cartItem.quantity
-                 }
-            })
-        })  
-        return res.data
-    }) 
-
-    // make cart detail in redux store
-
-    //
-    return {
-        type: GET_CART_ITEMS_USER,
-        payload: request
-    }
-
-}
-
-export function removeCartItem(id) {
-    const request = 
-    Axios.get(`${baseUrl}/user/removeFromCart?id=${id}`)
-    .then(res => {
-         res.data.cart.forEach(item =>{
-             res.data.cartDetail.forEach((k, i) => {
-                 if(item.id === k._id){
-                     res.data.cartDetail[i].quantity = item.quantity
-                 }
-             })
-         })
-         return res.data
-    }) 
-
-    // make cart detail in redux store
-
-    //
-    return {
-        type: REMOVE_CART_ITEM_USER,
-        payload: request
-    }
-
-}
-
-export function onSuccessBuy (data) {
-    return {
-        type: ON_SUCCESS_BUY,
-        payload: data
-    }
 }

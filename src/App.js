@@ -24,13 +24,14 @@ import { Details } from './account/pages/profile/details';
 import { createBrowserHistory } from 'history';
 //
 import { PrivateRoute } from '../src/component/PrivateRoute'
+import UploadVideoPage from './Youtube/UploadVideoPage/UploadVideoPage';
+import LandingPage from './Youtube/LandingPage/LandingPage';
+import DetailVideoPage from './Youtube/DetailVideoPage/DetailVideoPage';
+import SubscriptionPage from './Youtube/SubscriptionPage/SubscriptionPage';
+
 
 //
-import UploadProductPage from '../src/shop/UploadProductPage'
-import LandingPage from '../src/shop/LandingPage'
-import DetailProductPage from '../src/shop/views/DetailProductPage/DetailProductPage'
-import CartPage from './shop/views/CartPage/CartPage';
-import HistoryPage from './shop/views/HistoryPage/HistoryPage';
+
 
 const theme = createMuiTheme({
   palette: {
@@ -83,12 +84,11 @@ function App() {
          <PrivateRoute exact path="/admin/edit/:id" roles={[Role.Admin]} component={ AddEditConnect } />
          <PrivateRoute exact path="/profile" component={ Details } />
          <PrivateRoute exact path="/profile/update" component={ Update } />
-         <PrivateRoute exact path="/" component={Home} />
-         <PrivateRoute exact path="/product/add"  component={UploadProductPage} />
-         <PrivateRoute exact path="/products"  component={LandingPage} />
-         <PrivateRoute exact path="/product/:productId"  component={DetailProductPage} />
-         <PrivateRoute exact path="/user/cart"  component={CartPage} />
-         <PrivateRoute exact path="/user/history"  component={HistoryPage} />
+         <PrivateRoute exact path="/home" component={Home} />
+         <PrivateRoute exact path="/upload" component={UploadVideoPage} />
+         <PrivateRoute exact path="/" component={LandingPage} />
+         <PrivateRoute exact path="/video/:videoId" component={DetailVideoPage} />
+         <PrivateRoute exact path="/subscription" component={SubscriptionPage} />
          <Redirect from="*" to="/" />
        </Switch>
       </div>

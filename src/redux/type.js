@@ -11,8 +11,5 @@ export const GET_ONE_USER = "GET_ONE_USER"
 export const UPDATE_USER = "UPDATE_USER"
 export const ADD_USER = "ADD_USER"
 export const DELETE_USER = "DELETE_USER"
-export const ADD_TO_CART_USER ="ADD_TO_CART_USER"
-export const GET_CART_ITEMS_USER = "GET_CART_ITEMS_USER"
-export const REMOVE_CART_ITEM_USER = "REMOVE_CART_ITEM_USER"
-export const ON_SUCCESS_BUY = "ON_SUCCESS_BUY,"
+
 //UI reducer types

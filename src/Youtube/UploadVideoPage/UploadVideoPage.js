@@ -1,27 +1,29 @@
 import React, {useState} from 'react'
 import { Typography, Button, } from '@material-ui/core'
 import TextField from '@material-ui/core/TextField'
-import FileUpload from '../util/FileUpload'
+import FileUpload from '../../util/FileUpload'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { connect } from 'react-redux'
-import { accountService} from '../redux/actions/userActions';
+import { accountService} from '../../redux/actions/userActions';
 import Axios from 'axios';
 //import { useDispatch } from "react-redux"
 
-const Continents = [
-    { key: 1, value: 'Africa'},
-    { key: 2, value: 'Europe'},
-    { key: 3, value: 'Asia'},
-    { key: 4, value: 'North America'},
-    { key: 5, value: 'South America'},
-    { key: 6, value: 'Australia'},
-    { key: 7, value: 'Antartica'}
+const Category = [
+    { key: 1, value: 'Film & Animation'},
+    { key: 2, value: 'Autos & Vehicles'},
+    { key: 3, value: 'Music'},
+    { key: 4, value: 'Pets & Animals'},
+    { key: 5, value: 'Sports'},
+]
+
+const Privacy = [
+     {value: 0, label: 'Private'},
+     {value: 1, label: 'Public'}
 ]
 
 
-
-function UploadProductPage(props) {
+function UploadVideoPage(props) {
 
     // const dispatch = useDispatch()
     // const user = accountService.userValue.id
@@ -29,9 +31,12 @@ function UploadProductPage(props) {
 
     const [TitleValue, setTitleValue] = useState('')
     const [DescriptionValue, setDescriptionValue] = useState("")
-    const [PriceValue, setPriceValue] = useState(0)
-    const [ContinentsValue, setContinents] = useState(1)
-    const [Images, setImages] = useState([])
+    const [CategoryValue, setCategory] = useState("Film & Animation")
+    const [PrivacyValue, setPrivacy] = useState(0)
+    const [FilePath, setFilePath] = useState("")
+    const [Duration, setDuration] = useState("") 
+    const [Thumbnail, setThumbnail] = useState("")
+
  
     const onTitleChange = (event) => {
        setTitleValue(event.target.value)
@@ -40,24 +45,36 @@ function UploadProductPage(props) {
     const onDescriptionChange= (event) => {
         setDescriptionValue(event.target.value)
      }
-     const onPriceChange = (event) => {
-        setPriceValue(event.target.value)
-     }
-     const onContinentsChange=(event)=> {
-         setContinents(event.target.value)
+   
+     const onCategoryChange=(event)=> {
+         setCategory(event.target.value)
      }
 
-    const updateImages = (newImages) => {
-        console.log(newImages)
-        setImages(newImages)
+     const onPrivacyChange=(event)=> {
+        setPrivacy(event.target.value)
     }
 
-    const baseUrl = 'http://localhost:5000/accounts';
+    const updateFilePath = (newVideo) => {
+        console.log(newVideo)
+        setFilePath(newVideo)
+    }
+
+    const updateThumbnailPath = (newThumbnail) => {
+        console.log(newThumbnail)
+        setThumbnail(newThumbnail)
+    }
+
+    const durationTime = (newDuration) => {
+        console.log(newDuration)
+        setDuration(newDuration)
+    }
+
+    const baseUrl = 'http://localhost:5000/youtube';
 
     const onSubmit = (event) => {
        event.preventDefault()
 
-       if(!TitleValue || !DescriptionValue || !PriceValue || !ContinentsValue || !Images){
+       if(!TitleValue || !DescriptionValue){
             return alert("All fields are required")
        }
 
@@ -68,16 +85,18 @@ function UploadProductPage(props) {
            writer: user,
            title: TitleValue,
            description: DescriptionValue,
-           price: PriceValue,
-           images: Images,
-           continents: ContinentsValue       
+           filePath: FilePath,
+           category: CategoryValue,
+           privacy: PrivacyValue,
+           duration: Duration,
+           thumbnail: Thumbnail    
        }
-            console.log("data", dataToSubmit)
-       Axios.post(`${baseUrl}/product/uploadProduct`, dataToSubmit)
+           console.log("data", dataToSubmit)
+       Axios.post(`${baseUrl}/video/uploadVideo`, dataToSubmit)
              .then((res) => {
                  if(res.data.success){
-                       alert('Upload Successfull')
-                       props.history.push('/')
+                       alert('Upload Successfully')
+                       props.history.push('/landingPage')
                  }else{
                      alert('Upload Failed')
                  }
@@ -87,13 +106,15 @@ function UploadProductPage(props) {
     return (
         <div style={{ maxWidth: '700px', margin:'2rem auto'}}>
             <div style={{textAlign: 'center', marginBottom:'2rem'}}>
-                 <Typography variant="h2">Upload Product</Typography>
+                 <Typography variant="h2">Upload Video</Typography>
             </div>
             
             <form onSubmit={onSubmit}>
                {/* dropzone */}
                <FileUpload
-               refreshFunction = {updateImages}/>
+               refreshFunction = {updateFilePath}
+               thumbnailRefresh = {updateThumbnailPath}
+               duration = {durationTime}/>
 
                <br/>
                <br/>
@@ -116,23 +137,21 @@ function UploadProductPage(props) {
                rows="5"
                onChange={onDescriptionChange}
                value={DescriptionValue}/>
-
                <br/>
                <br/>
-               <TextField
-               label="Price($)"
-               fullWidth
-               required
-               variant='outlined'
-               onChange={onPriceChange}
-               value={PriceValue}
-               type="number"/>
-               <br/>
-               <br/>
-               <Select value={ContinentsValue} variant="outlined"  onChange={onContinentsChange}>
-               {Continents.map(item => 
-                    <MenuItem key={item.key} value={item.key}>
+               <Select value={CategoryValue} variant="outlined"  onChange={onCategoryChange}>
+               {Category.map(item => 
+                    <MenuItem key={item.key} value={item.value}>
                           {item.value}
+                    </MenuItem>
+               )}      
+               </Select>
+               <br/>
+               <br/>
+               <Select value={PrivacyValue} variant="outlined"  onChange={onPrivacyChange}>
+               {Privacy.map(item => 
+                    <MenuItem key={item.value} value={item.value}>
+                          {item.label}
                     </MenuItem>
                )}      
                </Select>
@@ -153,4 +172,4 @@ const mapStateToProps = (state) => ({
    
   });
 
-export default connect( mapStateToProps )(UploadProductPage) 
+export default connect( mapStateToProps )(UploadVideoPage) 
